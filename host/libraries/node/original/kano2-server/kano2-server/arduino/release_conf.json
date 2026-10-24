@@ -1,0 +1,51 @@
+{
+    "KSPK": {
+        "MCU_FW": {
+            "sourcedir": "cameraServer",
+            "inofile": "cameraServer.ino",
+            "board": "Kano:samd:kano_lightboard",
+            "version": "1.0.1-rc3"
+        }
+    },
+    "gesture-sensor": {
+        "MCU_FW": {
+            "sourcedir": "gesture-sensor",
+            "inofile": "gesture-sensor.ino",
+            "board": "Kano:samd:kano_sensor",
+            "version": "0.0.1-alpha1"
+        }
+    },
+    "gesture-sensor": {
+        "MCU_FW": {
+            "sourcedir": "gesture-sensor",
+            "inofile": "gesture-sensor.ino",
+            "board": "Kano:samd:kano_sensor",
+            "version": "0.0.1-alpha1"
+        }
+    },
+    "proximity-sensor": {
+        "MCU_FW": {
+            "sourcedir": "proximity-sensor",
+            "inofile": "proximity-sensor.ino",
+            "board": "Kano:samd:kano_sensor",
+            "version": "0.0.1-alpha1"
+        }
+    },
+    "motion-sensor": {
+        "MCU_FW": {
+            "sourcedir": "motion-sensor",
+            "inofile": "motion-sensor.ino",
+            "board": "Kano:samd:kano_sensor",
+            "version": "0.0.1-alpha1"
+        }
+    },
+    "gyro-accelerometer": {
+        "MCU_FW": {
+            "sourcedir": "gyro-accelerometer",
+            "inofile": "gyro-accelerometer.ino",
+            "board": "Kano:samd:kano_sensor",
+            "version": "1.0.1-rc1"
+        }
+    }
+}
+    

@@ -1,0 +1,11 @@
+[Unit]
+Description=Kano Hostname Service
+Documentation=https://github.com/KanoComputing/kano2-server
+After=systemd-random-seed.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /home/kano/kano2-server/mdns-install/kano2-hostname.sh
+
+[Install]
+WantedBy=avahi-daemon.service

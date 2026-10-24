@@ -1,0 +1,1 @@
+KERNEL=="android0", SUBSYSTEM=="android_usb",  RUN+="/sbin/otg_detect.sh"

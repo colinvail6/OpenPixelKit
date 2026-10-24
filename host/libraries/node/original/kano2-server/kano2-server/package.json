@@ -1,0 +1,36 @@
+{
+  "name": "kano2-server",
+  "description": "The back-end part of Kano 2",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/start",
+    "test": "mocha ./tests/**/*test.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.16.1",
+    "canvas": "^1.4.0",
+    "color": "^1.0.3",
+    "command-line-args": "^4.0.1",
+    "cors": "^2.7.1",
+    "debug": "^2.6.3",
+    "diskusage": "^0.2.1",
+    "express": "^4.14.1",
+    "kano2-shared-lib": "git@github.com:KanoComputing/kano2-shared-lib.git",
+    "morgan": "^1.8.1",
+    "nan": "^2.5.1",
+    "node-fetch": "^1.6.0",
+    "node-gameloop": "0.1.0",
+    "pull-stream": "^3.5.0",
+    "socket.io": "^1.4.8",
+    "tmp": "0.0.31",
+    "yargs": "^6.6.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "read-audio": "^8.1.0"
+  },
+  "optionalDependencies": {
+    "lodash": "^4.16.6"
+  }
+}

@@ -1,0 +1,13 @@
+[Unit]
+Description=Kano card fix before shut down
+Conflicts=reboot.target
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+ExecStop=/bin/bash /home/kano/kano2-server/tools/before_shutdown.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

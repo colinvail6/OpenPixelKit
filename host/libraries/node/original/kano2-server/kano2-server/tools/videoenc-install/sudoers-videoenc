@@ -1,0 +1,2 @@
+kano ALL=(ALL) NOPASSWD: /usr/bin/videoenc
+kano ALL=(ALL) NOPASSWD: /bin/kill

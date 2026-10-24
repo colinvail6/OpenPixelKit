@@ -1,0 +1,91 @@
+{
+    "default": {
+        "DATA_API_URL": "https://apps-data-staging.kano.me",
+        "SERVER_PORT": 3000,
+        "lightboard": {
+            "x_count": 16,
+            "y_count": 8,
+            "channels_per_px": 2,
+            "background_color": "#000000",
+            "supported_dongles": ["motion-sensor", "gyro-accelerometer"],
+            "wifi_dependant": ["weather", "iss", "weather", "shares", "rss", "sports", "clock"]
+        },
+        "games": {
+            "frame_rate": 20,
+            "background_color": "#000000",
+            "startup_animation_colors": ["#03FF63", "#FCD535", "#F23A02"],
+            "game_over_score_color": "#4C9BB5",
+            "snake_head_color": "#FFFFFF",
+            "menu_border_color": "#FFFFFF",
+            "snake_icon": "./lib/assets/snake.png",
+            "rainbow_icon": "./lib/assets/rainbow.png",
+            "breakout_icon": "./lib/assets/breakout.png"
+        },
+        "animations": {
+            "error": "./lib/assets/error.png",
+            "missing_wifi": {
+                "frames": [
+                    "./lib/assets/wifi1.png",
+                    "./lib/assets/wifi2.png",
+                    "./lib/assets/wifi3.png"
+                ]
+            },
+            "missing_dongle": {
+                "pixel": "./lib/assets/pixel_sensors.png",
+                "air": "./lib/assets/sensor-air.png",
+                "distance": "./lib/assets/sensor-distance.png",
+                "gyro-accelerometer": "./lib/assets/gyro-accelerometer.png",
+                "motion-sensor": "./lib/assets/motion-sensor.png",
+                "mic": "./lib/assets/sensor-mic.png",
+                "trip": "./lib/assets/sensor-trip.png"
+            }
+        },
+        "lightshow": {
+            "frame_rate": 20,
+            "perlin_icon": "./lib/assets/perlin.png",
+            "soundvis_icon": "./lib/assets/soundvis.png",
+            "particles_icon": "./lib/assets/particles.png",
+            "perlin_noisescale_step": 0.01,
+            "perlin_noisescale_max": 1,
+            "perlin_noisescale_min": 0.02,
+            "perlin_timescale_step": 0.01,
+            "perlin_timescale_max": 1,
+            "perlin_timescale_min": 0.02,
+            "particle_count": 30
+        },
+        "device_control": {
+            "device_path": "/dev/ttyGS0",
+            "battery_capacity": "/sys/class/power_supply/battery/capacity",
+            "battery_status": "/sys/class/power_supply/battery/status",
+            "battery_check_interval": 500,
+            "factory_reset_timeout": 6000
+        },
+        "kit_device": {
+            "serial_path": "/dev/ttyS2",
+            "baud_rate": 115200,
+            "data_bits": 8,
+            "stop_bits": 1,
+            "parity": "none",
+            "pad_length": 227
+        },
+        "microphone": {
+            "streamBufferSize": 1024,
+            "rawVolumeMultiplier": 1000
+        },
+        "piezo": {
+            "low": {
+                "freq": 55,
+                "duration": 100
+            },
+            "medium": {
+                "freq": 440,
+                "duration": 100
+            },
+            "high": {
+                "freq": 1175,
+                "duration": 100
+            }
+        },
+        "app-name": "kano2-server"
+    }
+}

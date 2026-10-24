@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Lightboard Simulator</title>
+        <style media="screen">
+            html, body {
+                margin: 0px;
+                padding: 0px;
+                -webkit-user-select: none;
+            }
+            .container {
+                position: relative;
+                width: 612px;
+                height: 425px;
+            }
+            .container img {
+                width: 100%;
+                height: 100%;
+            }
+            canvas {
+                position: absolute;
+                top: 49px;
+                left: 14px;
+            }
+            #wheel {
+                position: absolute;
+                top: 9px;
+                left: 43px;
+                width: 132px;
+                text-align: center;
+                font-family: Arial;
+                color: white;
+                cursor: pointer;
+            }
+            #btn-b {
+                position: absolute;
+                width: 46px;
+                height: 46px;
+                left: 479px;
+                top: 346px;
+                border-radius: 50%;
+                cursor: pointer;
+            }
+            #btn-a {
+                position: absolute;
+                width: 46px;
+                height: 46px;
+                left: 539px;
+                top: 346px;
+                border-radius: 50%;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body style="-webkit-app-region: drag">
+        <div class="container">
+            <img src="./kit.svg" alt="kit background"/>
+            <canvas id="canvas" width="585" height="290"></canvas>
+            <div id="wheel"></div>
+            <div id="btn-b"></div>
+            <div id="btn-a"></div>
+        </div>
+        <script type="text/javascript">
+            "use strict";
+            const {ipcRenderer} = require('electron'),
+                canvas = document.getElementById('canvas'),
+                ctx = canvas.getContext('2d'),
+                pixelSize = 28,
+                spacingX = 7.2,
+                spacingY = 5.2,
+                KEY_UP = 38,
+                KEY_DOWN = 40,
+                KEY_LEFT = 37,
+                KEY_RIGHT = 39,
+                KEY_A = 32,
+                KEY_B = 90,
+                modes = [{
+                    id: 'offline-1',
+                    label: 'Offline 1'
+                }, {
+                    id: 'offline-2',
+                    label: 'Offline 2'
+                }, {
+                    id: 'online-p1',
+                    label: 'Online 1'
+                }, {
+                    id: 'online-p2',
+                    label: 'Online 2'
+                }, {
+                    id: 'online-p3',
+                    label: 'Online 3'
+                }];
+
+            let currentMode = -1,
+                wheel = document.getElementById('wheel'),
+                btnA = document.getElementById('btn-a'),
+                btnB = document.getElementById('btn-b');
+
+            btnA.addEventListener('mouseup', () => {
+                sendEvent('button-up', {
+                    'button-id': 'btn-A'
+                });
+            });
+
+            btnA.addEventListener('mousedown', () => {
+                sendEvent('button-down', {
+                    'button-id': 'btn-A'
+                });
+            });
+
+            btnB.addEventListener('mouseup', () => {
+                sendEvent('button-down', {
+                    'button-id': 'btn-B'
+                });
+            });
+
+            btnB.addEventListener('mousedown', () => {
+                sendEvent('button-down', {
+                    'button-id': 'btn-B'
+                });
+            });
+
+            ctx.globalAlpha = 0.9;
+
+            function updateCanvas(pixels) {
+                ctx.clearRect(0, 0, canvas.getAttribute('width'), canvas.getAttribute('height'));
+                pixels.forEach((color, index) => {
+                    let x = index % 16,
+                        y = Math.floor(index / 16),
+                        rgb = hexToRgb(color);
+                    ctx.globalAlpha = rgbToHsl(rgb.r, rgb.g, rgb.b)[2];
+                    ctx.fillStyle = color;
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                    ctx.fillRect(15 + x * (pixelSize + spacingX), 15 + y * (pixelSize + spacingY), pixelSize, pixelSize);
+                });
+            }
+
+            function updateMode() {
+                currentMode++;
+                if (currentMode > modes.length - 1) {
+                    currentMode = 0;
+                }
+                wheel.innerText = modes[currentMode].label;
+                sendEvent('mode-change', {
+                    mode: modes[currentMode].id
+                });
+            }
+
+            function rgbToHsl(r, g, b) {
+                var max, min, h, s, d, l;
+
+                r /= 255, g /= 255, b /= 255;
+                max = Math.max(r, g, b);
+                min = Math.min(r, g, b);
+                l = (max + min) / 2;
+
+                if (max == min) {
+                    h = s = 0; // achromatic
+                } else {
+                    d = max - min;
+                    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                    switch (max){
+                        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                        case g: h = (b - r) / d + 2; break;
+                        case b: h = (r - g) / d + 4; break;
+                    }
+                    h /= 6;
+                }
+
+                return [h, s, l];
+            }
+
+            function hexToRgb(hex) {
+                // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+                var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+                hex = hex.replace(shorthandRegex, function (m, r, g, b) {
+                    return r + r + g + g + b + b;
+                });
+
+                var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+
+            updateMode();
+
+            wheel.addEventListener('click', updateMode);
+
+            ipcRenderer.on('pixels', (event, data) => {
+                updateCanvas(data);
+            });
+
+            function sendEvent(name, data) {
+                ipcRenderer.send('event', {
+                    type: name,
+                    data
+                });
+            }
+
+            window.addEventListener('keydown', (e) => {
+                let code;
+                switch (e.keyCode) {
+                    case KEY_UP: {
+                        code = 'js-up';
+                        break;
+                    }
+                    case KEY_DOWN: {
+                        code = 'js-down';
+                        break;
+                    }
+                    case KEY_LEFT: {
+                        code = 'js-left';
+                        break;
+                    }
+                    case KEY_RIGHT: {
+                        code = 'js-right';
+                        break;
+                    }
+                    case KEY_A: {
+                        code = 'btn-A';
+                        break;
+                    }
+                    case KEY_B: {
+                        code = 'btn-B';
+                        break;
+                    }
+                    default:
+                        return;
+                }
+                sendEvent('button-down', {
+                    'button-id': code
+                });
+            });
+            window.addEventListener('keyup', (e) => {
+                let code;
+                switch (e.keyCode) {
+                    case KEY_UP: {
+                        code = 'js-up';
+                        break;
+                    }
+                    case KEY_DOWN: {
+                        code = 'js-down';
+                        break;
+                    }
+                    case KEY_LEFT: {
+                        code = 'js-left';
+                        break;
+                    }
+                    case KEY_RIGHT: {
+                        code = 'js-right';
+                        break;
+                    }
+                    case KEY_A: {
+                        code = 'btn-A';
+                        break;
+                    }
+                    case KEY_B: {
+                        code = 'btn-B';
+                        break;
+                    }
+                    default:
+                        return;
+                }
+                sendEvent('button-up', {
+                    'button-id': code
+                });
+            });
+        </script>
+    </body>
+</html>

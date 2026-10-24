@@ -1,0 +1,19 @@
+#!/usr/bin/env node
+"use strict";
+
+const wifi = require('../lib/wifi');
+
+global.log = {}
+global.log.debug = console.log;
+global.log.info = console.log;
+
+let args = process.argv.slice(0);
+args.shift();
+args.shift();
+
+let started = Date.now();
+wifi.addConnection(args[0], args[1]).then(connection => {
+    console.log('connected in ' + (Date.now() - started) + 'ms');
+}).catch(e => {
+    console.log(e);
+});

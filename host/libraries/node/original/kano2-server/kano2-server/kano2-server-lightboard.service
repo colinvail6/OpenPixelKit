@@ -1,0 +1,22 @@
+[Unit]
+Description=Kano 2 Server
+Documentation=https://github.com/KanoComputing/kano2-server
+
+# NB running enable_otg.sh too early causes a kernel crash
+# We wait until rc-local is finished which is where bpi do their
+# initialisation.
+After=rc-local.service
+Conflicts=serial-getty@ttyS3.service kano2-server-camera.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/node bin/start --device=lightboard
+PermissionsStartOnly=true
+Restart=on-failure
+RestartSec=5
+RemainAfterExit=no
+User=kano
+WorkingDirectory=/home/kano/kano2-server
+
+[Install]
+WantedBy=default.target

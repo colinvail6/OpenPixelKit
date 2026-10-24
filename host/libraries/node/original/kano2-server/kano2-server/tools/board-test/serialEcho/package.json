@@ -1,0 +1,14 @@
+{
+  "name": "serialecho",
+  "version": "1.0.0",
+  "description": "",
+  "main": "serialEcho.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "serialport": "^4.0.7"
+  }
+}

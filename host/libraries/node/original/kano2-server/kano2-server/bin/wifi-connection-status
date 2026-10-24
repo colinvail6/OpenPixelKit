@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+"use strict";
+
+const wifi = require('../lib/wifi');
+
+global.log = {};
+global.log.debug = console.log;
+global.log.info = console.log;
+
+let started = Date.now();
+wifi.getActiveConnectionStatus().then(connection => {
+    console.log('found in ' + (Date.now() - started) + 'ms');
+    console.log(connection);
+}).catch(e => {
+    console.log(e);
+});

@@ -1,0 +1,154 @@
+#!/usr/bin/env node
+"use strict";
+
+let getApp = require('../express-app'),
+    os = require('os'),
+    ModeManager = require('../mode-manager'),
+    storage = require('kano2-shared-lib/lib/storage'),
+    Devices = require('kano2-shared-lib/lib/devices/devices'),
+    Logger = require('kano2-shared-lib/lib/logger'),
+    config = require("../config.json").default,
+    cliOpts = require('./cli-parser')(config),
+    pjson = require('../package.json'),
+    MonitorBattery = require('../utils/monitor-battery'),
+    MonitorOTG = require('../utils/monitor-otg'),
+    MonitorWifi = require('../utils/monitor-wifi'),
+    FactoryReset = require('../utils/factory-reset'),
+    WatchdogMonitor = require('../utils/watchdog-monitor'),
+    port, app, server, devices, log;
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+function onError(error) {
+    var bind;
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            log.error(bind + ' requires elevated privileges');
+            process.exit(1);
+        break;
+        case 'EADDRINUSE':
+            log.error(bind + ' is already in use');
+            process.exit(1);
+        break;
+        default:
+            throw error;
+    }
+}
+
+/**
+ * Returns the version
+ * @return {object} An object in the form {server: "string", os: "string"}
+ */
+function getVersion() {
+    return { server: pjson.version, os: os.release() };
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+function onListening() {
+    var addr = app.server.address(),
+        bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+    log.info('Listening on ' + bind);
+}
+
+/**
+ * Starting point for the server
+ */
+function main() {
+    config = Object.assign(config, cliOpts, { isMacOS: os.platform() === 'darwin', version: getVersion()});
+    log = Logger.getLogger('kano2-server', config.logLevel);
+    config.log = log;
+    log.info('Kano 2 OS  running on version', config.version.os);
+
+    /*
+     * Initialise mode manager
+     */
+    let modeManager = ModeManager(config);
+        modeManager.setCloseCallback(() => {
+            try {
+                server.close();
+            } catch (err) {
+                log.error('Unable to stop the server', err);
+            }
+
+            devices.stopUSBWatch();
+        })
+        .start()
+        .then(() => {
+            MonitorBattery(config).start();
+            MonitorOTG(config).start((msg, rinfo) => {
+                    modeManager.otgPlugCallback(msg, rinfo);
+           });
+        });
+
+    /*
+     * Initialise devices manager
+     */
+    config.storage = storage.init(config);
+    devices = new Devices({storage: config.storage});
+    devices.start();
+
+    process.on('uncaughtException', (err) => {
+        log.error('UncaughtException', err);
+
+        // TODO: This is not elegant, trying to avoid adding risk
+        // by reducing changes complexity.
+        if (process.KanoserProgramStarted) {
+            log.debug('Error thrown while being in a programmed mode');
+        } else {
+            devices.stopUSBWatch();
+            process.exit(1);
+        }
+    });
+
+    /**
+     * Initialise the express server
+     */
+    app = getApp(config);
+    port = normalizePort(config.SERVER_PORT);
+    app.express.set('port', port);
+
+    server = app.server.listen(port);
+    app.server.on('error', onError);
+    app.server.on('listening', onListening);
+    log.info('Kano 2 server running on version', config.version.server);
+
+    /*
+     * Start additional services
+     */
+    MonitorWifi(config).start();
+    FactoryReset(config).start(() => {
+         modeManager.markReset();
+    });
+    WatchdogMonitor(config).start();
+}
+
+main();

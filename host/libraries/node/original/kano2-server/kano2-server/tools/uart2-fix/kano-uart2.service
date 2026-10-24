@@ -1,0 +1,9 @@
+[Unit]
+Description=Enables pin mux for uart2
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/gpio mode 2 alt5
+
+[Install]
+WantedBy=dev-ttyS2.device

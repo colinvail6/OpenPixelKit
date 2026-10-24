@@ -1,0 +1,16 @@
+[Unit]
+Description=Kano 2 Host AP mode
+Documentation=https://github.com/KanoComputing/kano2-server
+After=network.target NetworkManager.service
+
+[Service]
+Type=simple
+ExecStartPre=/bin/bash -c '/bin/echo 2 > /sys/module/bcmdhd/parameters/op_mode'
+ExecStart=/usr/bin/create_ap -n wlan0 kano2 --no-virt
+ExecStopPost=/usr/bin/create_ap -n wlan0 kano2 --no-virt --fix-unmanaged ; \
+/bin/bash -c '/bin/echo 0 > /sys/module/bcmdhd/parameters/op_mode' ; \
+/bin/systemctl restart wpa_supplicant.service
+KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+RemainAfterExit=no

@@ -1,0 +1,23 @@
+{
+  "browser": true,
+  "esnext": true,
+  "globals": { "angular": true,
+  		"describe": true,
+        "xdescribe": true,
+        "ddescribe": true,
+        "it": true,
+        "xit": true,
+        "iit": true,
+        "beforeEach": true,
+        "afterEach": true,
+        "expect": true,
+        "pending": true,
+        "log": true
+  	},
+  "globalstrict": true,
+  "quotmark": false,
+  "undef": true,
+  "unused": "vars",
+  "node": true,
+  "evil": false
+}
